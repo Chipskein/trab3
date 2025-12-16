@@ -81,6 +81,10 @@ export class PollsService {
             throw new ForbiddenError("Only the creator can close the poll");
         }
 
+        if (poll.status === 'CLOSED') {
+            throw new BadRequestError("Poll is already closed");
+        }
+
         poll.close();
 
         await this.pollsRepository.atualizar(poll);
@@ -118,6 +122,19 @@ export class PollsService {
             throw new ForbiddenError("Only the creator can extend the poll");
         }
 
+        if (poll.status === "CLOSED") {
+            throw new BadRequestError("Cannot extend a closed poll");
+        }
+
+        if (
+            poll.status === "SCHEDULED" &&
+            poll.startAt > new Date() &&
+            poll.endAt &&
+            poll.endAt < poll.startAt
+        ) {
+            throw new BadRequestError("endAt cannot be before startAt");
+        }
+
         if (input.endAt && input.endAt < new Date()) {
             throw new BadRequestError("endAt cannot be in the past");
         }
@@ -147,11 +164,14 @@ export class PollsService {
             throw new BadRequestError("Poll not found");
         }
 
-        if (poll.status !== "OPEN") {
+        if (poll.status === "CLOSED") {
             throw new BadRequestError("Poll is closed");
         }
 
-        if (poll.startAt > new Date()) {
+        if (
+            poll.status === "SCHEDULED" &&
+            poll.startAt > new Date()
+        ) {
             throw new BadRequestError("Poll has not started yet");
         }
 
@@ -256,6 +276,10 @@ export class PollsService {
                     userId: rest.userId
                 }
             };
+        } else if (rest.userVotes && !rest.userId) {
+            throw new BadRequestError("userId is required when userVotes is true");
+        } else if (!rest.userVotes && rest.userId) {
+            where.createdById = rest.userId;
         }
 
         return this.pollsRepository.listarComFiltros(where, page, limit);

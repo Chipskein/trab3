@@ -29,7 +29,6 @@ export class Poll {
     public description?: string;
     public visibility: PollVisibility;
     public status: PollStatus;
-    public votesCount?: number;
 
     public startAt: Date;
     public endAt?: Date;
@@ -46,7 +45,6 @@ export class Poll {
         this.title = props.title;
         this.description = props.description;
         this.visibility = props.visibility;
-        this.status = props.status ?? 'OPEN';
 
         this.startAt = props.startAt;
         this.endAt = props.endAt;
@@ -55,15 +53,16 @@ export class Poll {
         this.categories = props.categories;
         this.options = props.options;
 
-        this.status = this.resolveInitialStatus();
+        this.status = this.resolveInitialStatus(props.status);
         this.createdAt = new Date();
+        this.voteCount = props.voteCount ?? 0;
     }
 
-    private resolveInitialStatus(): PollStatus {
-        if (this.startAt > new Date()) {
+    private resolveInitialStatus(status?: PollStatus): PollStatus {
+        if (this.startAt > new Date() && (status === 'OPEN' || !status)) {
             return 'SCHEDULED';
         }
-        return 'OPEN';
+        return status ?? 'OPEN';
     }
 
     close(): void {

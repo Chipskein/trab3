@@ -28,6 +28,19 @@ Content-Type: {{contentType}}
 }
 
 ### ===============================
+### 1. REGISTRO DE USUÁRIO (OUTRO)
+### ===============================
+
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "name": "Teste",
+  "email": "teste@email.com",
+  "password": "123456"
+}
+
+### ===============================
 ### 2. LOGIN
 ### ===============================
 
@@ -47,7 +60,19 @@ POST {{baseUrl}}/auth/login
 Content-Type: {{contentType}}
 
 {
-  "email": "bruno@email.com",
+  "email": "maria@email.com",
+  "password": "123456"
+}
+
+### ===============================
+### 3. LOGIN (OUTRO)
+### ===============================
+
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "teste@email.com",
   "password": "123456"
 }
 
@@ -55,7 +80,10 @@ Content-Type: {{contentType}}
 ### 3. DEFINIR TOKEN (manual)
 ### ===============================
 
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQnJ1bm8iLCJlbWFpbCI6ImJydW5vQGVtYWlsLmNvbSIsImlkIjoiYmM4OWVkYTktMTA5YS00YWIxLTlmODQtN2FkYzEyZjFhM2FlIiwiaWF0IjoxNzY1ODU4MDg5fQ.1cdZ9G2ISLC6bUgRs2SG59JdpOF_3pqDoXXaB0TsPBQ
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQnJ1bm8iLCJlbWFpbCI6ImJydW5vQGVtYWlsLmNvbSIsImlkIjoiOGUzYTE4NTItYzk3OS00MGQ2LTkzYWItYTExODllZWFjNDQyIiwiaWF0IjoxNzY1OTA0MDkxfQ.OvWsQLM0Y0FwMjpWywrnpNeC-rsKBQy--T4lOcCJ5DU
+@outroToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiTWFyaWEiLCJlbWFpbCI6Im1hcmlhQGVtYWlsLmNvbSIsImlkIjoiYjYyNWI0NzQtODJhNy00OTM0LWE3NGYtYzEyZjJmZDAyMDU2IiwiaWF0IjoxNzY1OTA0MTIwfQ.frNyktjI0aLYEY1YOCDlMnnI41cwUnRNeoX-i-7NyWs
+
+@outroToken2 = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiVGVzdGUiLCJlbWFpbCI6InRlc3RlQGVtYWlsLmNvbSIsImlkIjoiMjI0ODA0YjEtY2FlOC00MWNkLWJhNmQtY2ZkZDlkMzc2NDk0IiwiaWF0IjoxNzY1OTA0NzMxfQ.9UHYD53rRvPmNwrRnF97_ZXANc8_nvhts-mA6H93M3s
 
 ### ===============================
 ### 4. CRIAR ENQUETE (PUBLICA)
@@ -84,17 +112,17 @@ Authorization: Bearer {{token}}
 ### 5. LISTAR ENQUETES (COM FILTROS)
 ### ===============================
 
-GET {{baseUrl}}/polls?category=tech&status=OPEN&page=1&limit=10
-Authorization: Bearer {{token}}
+GET {{baseUrl}}/polls?status=OPEN&page=1&limit=10
+Authorization: Bearer {{outroToken}}
 
 ### ===============================
 ### 6. DETALHES DA ENQUETE
 ### ===============================
 
-@pollId = 096670ba-990a-4bca-ae74-95339535d042
+@pollId = 2d178813-21bc-44f6-8147-4431010116f5
 
 GET {{baseUrl}}/polls/{{pollId}}
-Authorization: Bearer {{token}}
+Authorization: Bearer {{outroToken}}
 
 ### ===============================
 ### 7. VOTAR EM UMA OPÇÃO
@@ -102,10 +130,10 @@ Authorization: Bearer {{token}}
 
 POST {{baseUrl}}/polls/{{pollId}}/votes
 Content-Type: {{contentType}}
-Authorization: Bearer {{token}}
+Authorization: Bearer {{outroToken2}}
 
 {
-  "optionId": "e92520e0-426a-4226-a994-c482df192f4c"
+  "optionId": "047751ef-3d31-4439-b438-69afd3c7878d"
 }
 
 ### ===============================
@@ -120,7 +148,7 @@ Authorization: Bearer {{token}}
 ### ===============================
 
 GET {{baseUrl}}/me/polls/created?page=1&limit=10
-Authorization: Bearer {{token}}
+Authorization: Bearer {{outroToken}}
 
 ### ===============================
 ### 10. ENQUETES EM QUE O USUÁRIO VOTOU
@@ -207,7 +235,7 @@ Authorization: Bearer {{token}}
 Content-Type: {{contentType}}
 
 {
-  "optionId": "..."
+  "optionId": "2458f492-83ae-4270-a96d-1d4aa72e9059"
 }
 
 
