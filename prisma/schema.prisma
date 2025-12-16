@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:../dev.db"
+}
+
+model Vote {
+  id        String   @id @default(uuid())
+
+  userId    String
+  user      Usuario @relation(fields: [userId], references: [id])
+
+  pollId    String
+  poll      Poll    @relation(fields: [pollId], references: [id])
+
+  optionId  String
+  option    PollOption @relation(fields: [optionId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, pollId])
+  @@index([pollId])
+}
+
+
+model PollOption {
+  id        String   @id @default(uuid())
+  text      String
+
+  pollId   String
+  poll     Poll     @relation(fields: [pollId], references: [id])
+
+  votes    Vote[]
+}
+
+
+model Poll {
+  id            String          @id @default(uuid())
+  title         String
+  description   String?
+  visibility    String          @default("PUBLIC")
+  status        String          @default("OPEN")
+
+  startAt       DateTime
+  endAt         DateTime?
+  expectedVotes Int?
+
+  categories    String
+
+  createdById   String
+  createdBy     Usuario         @relation("UserPolls", fields: [createdById], references: [id])
+
+  options       PollOption[]
+  votes         Vote[]
+  voteCount     Int             @default(0)
+
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  @@index([status])
+  @@index([visibility])
+}
+
+
+model Usuario {
+  id        String   @id @default(uuid())
+  name String
+  email     String   @unique
+  password  String
+
+  polls     Poll[]   @relation("UserPolls")
+  votes     Vote[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

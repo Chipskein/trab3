@@ -1,0 +1,232 @@
+@baseUrl = http://localhost:8080
+@contentType = application/json
+
+### ===============================
+### 1. REGISTRO DE USUÁRIO
+### ===============================
+
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "name": "Bruno",
+  "email": "bruno@email.com",
+  "password": "123456"
+}
+
+### ===============================
+### 1. REGISTRO DE USUÁRIO (OUTRO)
+### ===============================
+
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "name": "Maria",
+  "email": "maria@email.com",
+  "password": "123456"
+}
+
+### ===============================
+### 2. LOGIN
+### ===============================
+
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "bruno@email.com",
+  "password": "123456"
+}
+
+### ===============================
+### 2. LOGIN (OUTRO)
+### ===============================
+
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "bruno@email.com",
+  "password": "123456"
+}
+
+### ===============================
+### 3. DEFINIR TOKEN (manual)
+### ===============================
+
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQnJ1bm8iLCJlbWFpbCI6ImJydW5vQGVtYWlsLmNvbSIsImlkIjoiYmM4OWVkYTktMTA5YS00YWIxLTlmODQtN2FkYzEyZjFhM2FlIiwiaWF0IjoxNzY1ODU4MDg5fQ.1cdZ9G2ISLC6bUgRs2SG59JdpOF_3pqDoXXaB0TsPBQ
+
+### ===============================
+### 4. CRIAR ENQUETE (PUBLICA)
+### ===============================
+
+POST {{baseUrl}}/polls
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "title": "Qual sua linguagem favorita?",
+  "description": "Enquete sobre linguagens de programação",
+  "visibility": "PUBLIC",
+  "startAt": "2025-12-01T09:00:00Z",
+  "endAt": "2025-12-20T23:59:59Z",
+  "expectedVotes": 100,
+  "categories": ["programming", "tech"],
+  "options": [
+    { "text": "JavaScript" },
+    { "text": "Python" },
+    { "text": "Java" }
+  ]
+}
+
+### ===============================
+### 5. LISTAR ENQUETES (COM FILTROS)
+### ===============================
+
+GET {{baseUrl}}/polls?category=tech&status=OPEN&page=1&limit=10
+Authorization: Bearer {{token}}
+
+### ===============================
+### 6. DETALHES DA ENQUETE
+### ===============================
+
+@pollId = 096670ba-990a-4bca-ae74-95339535d042
+
+GET {{baseUrl}}/polls/{{pollId}}
+Authorization: Bearer {{token}}
+
+### ===============================
+### 7. VOTAR EM UMA OPÇÃO
+### ===============================
+
+POST {{baseUrl}}/polls/{{pollId}}/votes
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "optionId": "e92520e0-426a-4226-a994-c482df192f4c"
+}
+
+### ===============================
+### 8. RESULTADO PARCIAL
+### ===============================
+
+GET {{baseUrl}}/polls/{{pollId}}/results
+Authorization: Bearer {{token}}
+
+### ===============================
+### 9. ENQUETES CRIADAS PELO USUÁRIO
+### ===============================
+
+GET {{baseUrl}}/me/polls/created?page=1&limit=10
+Authorization: Bearer {{token}}
+
+### ===============================
+### 10. ENQUETES EM QUE O USUÁRIO VOTOU
+### ===============================
+
+GET {{baseUrl}}/me/polls/voted?page=1&limit=10
+Authorization: Bearer {{token}}
+
+### ===============================
+### 11. ESTENDER ENQUETE
+### ===============================
+
+PATCH {{baseUrl}}/polls/{{pollId}}/extend
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "endAt": "2025-12-31T23:59:59Z",
+  "expectedVotes": 200
+}
+
+### ===============================
+### 12. ENCERRAR ENQUETE (EXTRA A)
+### ===============================
+
+POST {{baseUrl}}/polls/{{pollId}}/close
+Authorization: Bearer {{token}}
+
+
+### ===============================
+### 13. VOTAR DUAS VEZES (ERRO)
+### ===============================
+
+POST {{baseUrl}}/polls/{{pollId}}/votes
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "optionId": "e92520e0-426a-4226-a994-c482df192f4c"
+}
+
+
+### ===============================
+### 14. VOTAR EM ENQUETE ENCERRADA (ERRO)
+### ===============================
+
+POST {{baseUrl}}/polls/{{pollId}}/close
+Authorization: Bearer {{token}}
+
+### tentar votar depois de fechar
+POST {{baseUrl}}/polls/{{pollId}}/votes
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "optionId": "e92520e0-426a-4226-a994-c482df192f4c"
+}
+
+
+### ===============================
+### 15. CRIAR ENQUETE FUTURA
+### ===============================
+
+POST {{baseUrl}}/polls
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Enquete futura",
+  "visibility": "PUBLIC",
+  "startAt": "2026-01-01T00:00:00Z",
+  "expectedVotes": 10,
+  "options": [
+    { "text": "Opção A" },
+    { "text": "Opção B" }
+  ]
+}
+
+### ===============================
+### 16. VOTAR ANTES DO INÍCIO (ERRO)
+### ===============================
+POST {{baseUrl}}/polls/{{pollId}}/votes
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "optionId": "..."
+}
+
+
+###===============================
+###19. CRIAR ENQUETE PRIVADA
+###===============================
+POST {{baseUrl}}/polls
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Qual banco de dados você prefere?",
+  "description": "Enquete privada sobre bancos de dados",
+  "visibility": "PRIVATE",
+  "expectedVotes": 50,
+  "categories": ["database"],
+  "options": [
+    { "text": "PostgreSQL" },
+    { "text": "MySQL" },
+    { "text": "MongoDB" }
+  ]
+}
